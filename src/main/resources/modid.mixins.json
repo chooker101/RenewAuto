@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8.2",
+  "package": "net.fabricmc.renew_auto.extension",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+  ],
+  "client": [
+    "DispenserBehaviorExtension"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
