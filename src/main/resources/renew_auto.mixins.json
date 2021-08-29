@@ -4,10 +4,12 @@
   "package": "net.fabricmc.renew_auto.extension",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "HopperBlockEntityExtension"
   ],
   "client": [
-    "DispenserBehaviorExtension"
+    "CraftingTableBlockExtension"
   ],
+  "server": [],
   "injectors": {
     "defaultRequire": 1
   }

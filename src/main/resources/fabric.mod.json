@@ -14,16 +14,16 @@
   },
 
   "license": "CC0-1.0",
-  "icon": "assets/modid/icon.png",
+  "icon": "assets/renew_auto/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.fabricmc.renew_auto.RenewAuto"
+      "net.fabricmc.renew_auto.RenewAutoInitialize"
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "renew_auto.mixins.json"
   ],
 
   "depends": {
