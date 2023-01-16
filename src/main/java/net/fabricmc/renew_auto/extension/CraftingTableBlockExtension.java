@@ -39,7 +39,7 @@ public abstract class CraftingTableBlockExtension extends Block implements Block
              ItemScatterer.spawn(world, pos, (CraftingTableBlockEntity)blockEntity);
              world.updateComparators(pos,this);
          }
-         super.onStateReplaced(state, world, pos, newState, moved);
+         //super.onStateReplaced(state, world, pos, newState, moved);
       }
     }
 
@@ -59,7 +59,7 @@ public abstract class CraftingTableBlockExtension extends Block implements Block
     }
 
     public boolean onSyncedBlockEvent(BlockState state, World world, BlockPos pos, int type, int data) {
-       super.onSyncedBlockEvent(state, world, pos, type, data);
+       //super.onSyncedBlockEvent(state, world, pos, type, data);
        BlockEntity blockEntity = world.getBlockEntity(pos);
        return blockEntity == null ? false : blockEntity.onSyncedBlockEvent(type, data);
     }

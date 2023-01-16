@@ -81,13 +81,12 @@ public class CraftingTableBlockEntity extends LootableContainerBlockEntity imple
       }
    }
 
-   public NbtCompound writeNbt(NbtCompound nbt) {
+   public void writeNbt(NbtCompound nbt) {
       super.writeNbt(nbt);
       if (!this.craftingInventory.isEmpty()) {
          Inventories.writeNbt(nbt, this.craftingInventory.stacks);
          FilterHelper.writeNbt(nbt, filterItems);
       }
-      return nbt;
    }
 
    protected DefaultedList<ItemStack> getInvStackList() {

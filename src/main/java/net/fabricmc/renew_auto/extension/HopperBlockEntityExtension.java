@@ -40,10 +40,9 @@ public abstract class HopperBlockEntityExtension extends LootableContainerBlockE
       FilterHelper.readNbt(nbt, filterItems);
    }
 
-   @Inject(method = "writeNbt", at = @At("RETURN"), cancellable = true)
-   public void writeNbtExtension(NbtCompound nbt, CallbackInfoReturnable<NbtCompound> ci) {
+   @Inject(method = "writeNbt", at = @At("RETURN"))
+   public void writeNbtExtension(NbtCompound nbt, CallbackInfo ci) {
       nbt = FilterHelper.writeNbt(nbt, filterItems);
-      ci.setReturnValue(nbt);
    }
 
     @Override

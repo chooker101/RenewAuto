@@ -28,6 +28,7 @@ import net.minecraft.screen.ScreenHandlerContext;
 public class CraftingFilterItem extends Item implements Inventory {
     private static final Text TITLE = new TranslatableText("container.crafting");
     private DefaultedList<ItemStack> temporaryItemStacks;
+    private boolean hasBeenUsedOnBlock = false;
 
     public CraftingFilterItem(Item.Settings settings) {
         super(settings);
@@ -42,8 +43,11 @@ public class CraftingFilterItem extends Item implements Inventory {
         if (world.isClient) {
            return  TypedActionResult.pass(user.getStackInHand(hand));
         } else {
-           user.openHandledScreen(createScreenHandlerFactory(world, user.getBlockPos(), this));
-           return TypedActionResult.consume(user.getStackInHand(hand));
+            if(!hasBeenUsedOnBlock) {
+                user.openHandledScreen(createScreenHandlerFactory(world, user.getBlockPos(), this));
+            }
+            hasBeenUsedOnBlock = false;
+            return TypedActionResult.consume(user.getStackInHand(hand));
         }
     }
 
@@ -77,7 +81,8 @@ public class CraftingFilterItem extends Item implements Inventory {
 
                     if(!isEmpty){
                         craftingTableEntity.setFilterItems(temp);
-                        return ActionResult.CONSUME;
+                        hasBeenUsedOnBlock = true;
+                        return ActionResult.SUCCESS;
                     }
                 }
             }

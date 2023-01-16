@@ -1,0 +1,48 @@
+{
+    "type": "minecraft:block",
+    "pools": [
+      {
+        "rolls": 1.0,
+        "bonus_rolls": 0.0,
+        "entries": [
+          {
+            "type": "minecraft:item",
+            "functions": [
+              {
+                "function": "minecraft:copy_nbt",
+                "source": "block_entity",
+                "ops": [
+                  {
+                    "source": "SpawnData",
+                    "target": "BlockEntityTag.SpawnData",
+                    "op": "replace"
+                  },
+                  {
+                    "source": "SpawnPotentials",
+                    "target": "BlockEntityTag.SpawnPotentials",
+                    "op": "replace"
+                  }
+                ]
+              }
+            ],
+            "name": "minecraft:spawner"
+          }
+        ],
+        "conditions": [
+          {
+            "condition": "minecraft:match_tool",
+            "predicate": {
+              "enchantments": [
+                {
+                  "enchantment": "minecraft:silk_touch",
+                  "levels": {
+                    "min": 1
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }

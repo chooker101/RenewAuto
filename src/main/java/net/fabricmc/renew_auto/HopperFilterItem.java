@@ -29,6 +29,7 @@ import net.minecraft.screen.HopperScreenHandler;
 public class HopperFilterItem extends Item implements Inventory {
     private static final Text TITLE = new TranslatableText("container.crafting");
     private DefaultedList<ItemStack> stacks;
+    private boolean hasBeenUsedOnBlock = false;
 
     public HopperFilterItem(Item.Settings settings) {
         super(settings);
@@ -41,10 +42,13 @@ public class HopperFilterItem extends Item implements Inventory {
 
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if (world.isClient) {
-           return  TypedActionResult.pass(user.getStackInHand(hand));
+            return  TypedActionResult.pass(user.getStackInHand(hand));
         } else {
-           user.openHandledScreen(createScreenHandlerFactory(world, user.getBlockPos(), this));
-           return TypedActionResult.consume(user.getStackInHand(hand));
+            if (!hasBeenUsedOnBlock) {
+                user.openHandledScreen(createScreenHandlerFactory(world, user.getBlockPos(), this));
+            }
+            hasBeenUsedOnBlock = false;
+            return TypedActionResult.consume(user.getStackInHand(hand));
         }
     }
 
@@ -78,7 +82,8 @@ public class HopperFilterItem extends Item implements Inventory {
 
                     if(!isEmpty){
                         hopperBlockEntity.setFilterItems(temp);
-                        return ActionResult.CONSUME;
+                        hasBeenUsedOnBlock = true;
+                        return ActionResult.SUCCESS;
                     }
                 }
             }

@@ -58,7 +58,7 @@ public class ToolDispenserBehavior extends FallibleItemDispenserBehavior {
 
       boolean newBlocks = false;
 
-      while(depth < 50) {
+      while(depth <= 50) {
          for (int i = 0; i < list.get(depth).size(); i++) {
             pos = list.get(depth).get(i);
 
@@ -277,7 +277,9 @@ public class ToolDispenserBehavior extends FallibleItemDispenserBehavior {
          if(!newBlocks) {
             break;
          }
-         depth++;
+         if(depth < 50) {
+            depth++;
+         }
          newBlocks = false;
       }
    }
