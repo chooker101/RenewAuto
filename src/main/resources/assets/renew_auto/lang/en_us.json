@@ -1,5 +1,4 @@
 {
     "item.renew_auto.crafting_filter": "Crafting Table Filter",
-    "item.renew_auto.hopper_filter": "Hopper Filter",
-    "block.renew_auto.copper_pipe": "Copper Pipe"
+    "item.renew_auto.hopper_filter": "Hopper Filter"
 }
