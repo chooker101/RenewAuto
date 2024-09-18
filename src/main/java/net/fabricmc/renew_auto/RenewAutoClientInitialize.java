@@ -13,7 +13,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 @Environment(EnvType.CLIENT)
 public class RenewAutoClientInitialize implements ClientModInitializer {
-    public static final Identifier PacketID = new Identifier("renew_auto", "spawn_packet");
+    public static final Identifier PacketID = new Identifier("renew_auto", "spawn_packet"); //Rename me please
 
     @Override
     public void onInitializeClient() {
