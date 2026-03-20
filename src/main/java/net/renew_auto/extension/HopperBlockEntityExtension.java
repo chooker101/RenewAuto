@@ -1,4 +1,4 @@
-package net.fabricmc.renew_auto.extension;
+package net.renew_auto.extension;
 
 import java.util.Iterator;
 import net.minecraft.block.BlockState;
@@ -14,8 +14,8 @@ import net.minecraft.block.entity.Hopper;
 import net.minecraft.block.entity.LootableContainerBlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 
-import net.fabricmc.renew_auto.FilterHelper;
-import net.fabricmc.renew_auto.FilterEntityInterface;
+import net.renew_auto.FilterHelper;
+import net.renew_auto.FilterEntityInterface;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;

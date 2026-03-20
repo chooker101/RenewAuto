@@ -1,11 +1,11 @@
-package net.fabricmc.renew_auto.dispenser;
+package net.renew_auto.dispenser;
 
 import java.util.Vector;
-import java.util.Random;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPointer;
@@ -20,16 +20,15 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.tag.BlockTags;
 import net.minecraft.fluid.FluidState;
 
 public class ToolDispenserBehavior extends FallibleItemDispenserBehavior {
    private float currentBreakingProgress = 0.0F;
 
    protected ItemStack dispenseSilently(BlockPointer pointer, ItemStack stack) {
-      World world = pointer.getWorld();
+      World world = pointer.world();
       if (!world.isClient()) {
-         BlockPos blockPos = pointer.getPos().offset((Direction)pointer.getBlockState().get(DispenserBlock.FACING));
+         BlockPos blockPos = pointer.pos().offset((Direction)pointer.state().get(DispenserBlock.FACING));
          this.setSuccess(this.tryBreakBlock((ServerWorld)world, blockPos, stack));
       }
       return stack;
@@ -340,7 +339,7 @@ public class ToolDispenserBehavior extends FallibleItemDispenserBehavior {
                world.breakBlock(pos, true);
             }
             this.currentBreakingProgress = 0.0F;
-            if(stack.damage(1, (Random)world.getRandom(), (ServerPlayerEntity)null)) {
+            if(stack.damage(1, world.getRandom(), (ServerPlayerEntity)null)) {
                stack.setCount(0);
             }
          }
@@ -353,7 +352,7 @@ public class ToolDispenserBehavior extends FallibleItemDispenserBehavior {
    @Override
    protected void playSound(BlockPointer pointer) {
       if (!this.isSuccess()){
-         pointer.getWorld().syncWorldEvent(WorldEvents.DISPENSER_FAILS, pointer.getPos(), 0);
+         pointer.world().syncWorldEvent(WorldEvents.DISPENSER_FAILS, pointer.pos(), 0);
       }
    }
 }

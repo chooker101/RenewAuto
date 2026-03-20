@@ -1,4 +1,4 @@
-package net.fabricmc.renew_auto.dispenser;
+package net.renew_auto.dispenser;
 
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.entity.LivingEntity;
@@ -22,19 +22,19 @@ import java.util.List;
 public class PlantDispenserBehavior extends FallibleItemDispenserBehavior {
 
    protected ItemStack dispenseSilently(BlockPointer pointer, ItemStack stack) {
-      World world = pointer.getWorld();
+      World world = pointer.world();
       if (!world.isClient()) {
-         Direction direction = pointer.getBlockState().get(DispenserBlock.FACING);
-         BlockPos blockPos = pointer.getPos().offset(direction);
+         Direction direction = pointer.state().get(DispenserBlock.FACING);
+         BlockPos blockPos = pointer.pos().offset(direction);
          if(this.tryFeedAnimal((ServerWorld)world, blockPos, stack)) {
             this.setSuccess(true);
          }
          else {
             Item item = stack.getItem();
             if (item instanceof BlockItem) {
-               Direction direction2 = pointer.getWorld().isAir(blockPos.down()) ? direction : Direction.UP;
+               Direction direction2 = pointer.world().isAir(blockPos.down()) ? direction : Direction.UP;
                try {
-                  this.setSuccess(((BlockItem)item).place(new AutomaticItemPlacementContext((World)pointer.getWorld(), blockPos, direction, stack, direction2)).isAccepted());
+                  this.setSuccess(((BlockItem)item).place(new AutomaticItemPlacementContext((World)pointer.world(), blockPos, direction, stack, direction2)).isAccepted());
                }
                catch (Exception exception) {
                   LOGGER.error("Error trying to place shulker box at {}", (Object)blockPos, (Object)exception);
@@ -57,14 +57,14 @@ public class PlantDispenserBehavior extends FallibleItemDispenserBehavior {
                if (i == 0 && animalEntity.canEat()) {
                   stack.decrement(1);
                   animalEntity.setLoveTicks(600);
-                  animalEntity.world.sendEntityStatus(animalEntity, (byte)18);
-                  animalEntity.emitGameEvent(GameEvent.MOB_INTERACT, animalEntity.getCameraBlockPos());
+                  animalEntity.getWorld().sendEntityStatus(animalEntity, (byte)18);
+                  animalEntity.emitGameEvent(GameEvent.ENTITY_INTERACT, animalEntity);
                   return true;
                }
                if (animalEntity.isBaby()) {
                   stack.decrement(1);
                   animalEntity.growUp((int)((float)(-i / 20) * 0.1f), true);
-                  animalEntity.emitGameEvent(GameEvent.MOB_INTERACT, animalEntity.getCameraBlockPos());
+                  animalEntity.emitGameEvent(GameEvent.ENTITY_INTERACT, animalEntity);
                   return true;
                }
            }
@@ -76,7 +76,7 @@ public class PlantDispenserBehavior extends FallibleItemDispenserBehavior {
    @Override
    protected void playSound(BlockPointer pointer) {
       if (!this.isSuccess()){
-         pointer.getWorld().syncWorldEvent(WorldEvents.DISPENSER_FAILS, pointer.getPos(), 0);
+         pointer.world().syncWorldEvent(WorldEvents.DISPENSER_FAILS, pointer.pos(), 0);
       }
    }
 }

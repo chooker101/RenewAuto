@@ -1,4 +1,4 @@
-package net.fabricmc.renew_auto;
+package net.renew_auto;
 
 import java.util.Optional;
 import net.minecraft.block.Blocks;
@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.book.RecipeBookCategory;
@@ -74,11 +75,11 @@ public class CraftingScreenHandlerExtension extends AbstractRecipeScreenHandler<
       if (!world.isClient) {
          ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity)player;
          ItemStack itemStack = ItemStack.EMPTY;
-         Optional<CraftingRecipe> optional = world.getServer().getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftingInventory, world);
+         Optional<RecipeEntry<CraftingRecipe>> optional = world.getServer().getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftingInventory, world);
          if (optional.isPresent()) {
-            CraftingRecipe craftingRecipe = (CraftingRecipe)optional.get();
-            if (resultInventory.shouldCraftRecipe(world, serverPlayerEntity, craftingRecipe)) {
-               itemStack = craftingRecipe.craft(craftingInventory);
+            CraftingRecipe craftingRecipe = (CraftingRecipe)optional.get().value();
+            if (resultInventory.shouldCraftRecipe(world, serverPlayerEntity, optional.get())) {
+               itemStack = craftingRecipe.craft(craftingInventory, world.getRegistryManager());
             }
          }
 
@@ -102,11 +103,11 @@ public class CraftingScreenHandlerExtension extends AbstractRecipeScreenHandler<
    }
 
    public boolean matches(Recipe<? super CraftingInventory> recipe) {
-      return recipe.matches(this.input, this.player.world);
+      return recipe.matches(this.input, this.player.getWorld());
    }
 
-   public void close(PlayerEntity player) {
-      super.close(player);
+   public void onClosed(PlayerEntity player) {
+      super.onClosed(player);
       this.input.onClose(player);
    }
 
@@ -123,7 +124,90 @@ public class CraftingScreenHandlerExtension extends AbstractRecipeScreenHandler<
       this.isFilter = isFilter;
    }
 
-   public ItemStack transferSlot(PlayerEntity player, int index) {
+   //public ItemStack transferSlot(PlayerEntity player, int index) {
+   //   ItemStack itemStack = ItemStack.EMPTY;
+   //   Slot slot = (Slot)this.slots.get(index);
+   //   if (slot != null && slot.hasStack()) {
+   //      ItemStack itemStack2 = slot.getStack();
+   //      itemStack = itemStack2.copy();
+   //      if (index == 0 && !this.isFilter) {
+   //         this.context.run((world, pos) -> {
+   //            itemStack2.getItem().onCraft(itemStack2, world);
+   //         });
+   //         if (!this.insertItem(itemStack2, 10, 46, true)) {
+   //            return ItemStack.EMPTY;
+   //         }
+//
+   //         slot.onQuickTransfer(itemStack2, itemStack);
+   //      } else if (index >= 10 && index < 46) {
+   //         if (!this.insertItem(itemStack2, 1, 10, false)) {
+   //            if (index < 37) {
+   //               if (!this.insertItem(itemStack2, 37, 46, false)) {
+   //                  return ItemStack.EMPTY;
+   //               }
+   //            } else if (!this.insertItem(itemStack2, 10, 37, false)) {
+   //               return ItemStack.EMPTY;
+   //            }
+   //         }
+   //      } else if (!this.insertItem(itemStack2, 10, 46, false)) {
+   //         return ItemStack.EMPTY;
+   //      }
+//
+   //      if (itemStack2.isEmpty()) {
+   //         slot.setStack(ItemStack.EMPTY);
+   //         onContentChanged(this.input);
+   //      } else {
+   //         slot.markDirty();
+   //      }
+//
+   //      if (itemStack2.getCount() == itemStack.getCount()) {
+   //         return ItemStack.EMPTY;
+   //      }
+//
+   //      slot.onTakeItem(player, itemStack2);
+   //      if (index == 0) {
+   //         player.dropItem(itemStack2, false);
+   //      }
+   //   }
+//
+   //   return itemStack;
+   //}
+
+   public boolean canInsertIntoSlot(ItemStack stack, Slot slot) {
+      return slot.inventory != this.result && super.canInsertIntoSlot(stack, slot);
+   }
+
+   public int getCraftingResultSlotIndex() {
+      return 0;
+   }
+
+   public int getCraftingWidth() {
+      return this.input.getWidth();
+   }
+
+   public int getCraftingHeight() {
+      return this.input.getHeight();
+   }
+
+   public int getCraftingSlotCount() {
+      return 10;
+   }
+
+   public RecipeBookCategory getCategory() {
+      return RecipeBookCategory.CRAFTING;
+   }
+
+   public boolean canInsertIntoSlot(int index) {
+      return index != this.getCraftingResultSlotIndex();
+   }
+
+   @Override
+   public boolean matches(RecipeEntry<? extends Recipe<CraftingInventory>> recipe) {
+      return recipe.value().matches(this.input, this.player.getWorld());
+   }
+
+   @Override
+   public ItemStack quickMove(PlayerEntity player, int index) {
       ItemStack itemStack = ItemStack.EMPTY;
       Slot slot = (Slot)this.slots.get(index);
       if (slot != null && slot.hasStack()) {
@@ -131,7 +215,7 @@ public class CraftingScreenHandlerExtension extends AbstractRecipeScreenHandler<
          itemStack = itemStack2.copy();
          if (index == 0 && !this.isFilter) {
             this.context.run((world, pos) -> {
-               itemStack2.getItem().onCraft(itemStack2, world, player);
+               itemStack2.getItem().onCraft(itemStack2, world);
             });
             if (!this.insertItem(itemStack2, 10, 46, true)) {
                return ItemStack.EMPTY;
@@ -170,33 +254,5 @@ public class CraftingScreenHandlerExtension extends AbstractRecipeScreenHandler<
       }
 
       return itemStack;
-   }
-
-   public boolean canInsertIntoSlot(ItemStack stack, Slot slot) {
-      return slot.inventory != this.result && super.canInsertIntoSlot(stack, slot);
-   }
-
-   public int getCraftingResultSlotIndex() {
-      return 0;
-   }
-
-   public int getCraftingWidth() {
-      return this.input.getWidth();
-   }
-
-   public int getCraftingHeight() {
-      return this.input.getHeight();
-   }
-
-   public int getCraftingSlotCount() {
-      return 10;
-   }
-
-   public RecipeBookCategory getCategory() {
-      return RecipeBookCategory.CRAFTING;
-   }
-
-   public boolean canInsertIntoSlot(int index) {
-      return index != this.getCraftingResultSlotIndex();
    }
 }

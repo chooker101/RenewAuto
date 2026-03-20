@@ -1,10 +1,8 @@
-package net.fabricmc.renew_auto;
+package net.renew_auto;
 
 import net.minecraft.util.Identifier;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
-
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.EnvType;
@@ -13,7 +11,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 @Environment(EnvType.CLIENT)
 public class RenewAutoClientInitialize implements ClientModInitializer {
-    public static final Identifier PacketID = new Identifier("renew_auto", "spawn_packet"); //Rename me please
+	public static final Identifier DISPENSER_BOBBER_SPAWN_PACKET_ID = new Identifier("renew_auto", "dispenser_bobber_spawn_packet");
 
     @Override
     public void onInitializeClient() {
@@ -22,16 +20,16 @@ public class RenewAutoClientInitialize implements ClientModInitializer {
     }
 
     public void receiveEntityPacket() {
-		ClientPlayNetworking.registerGlobalReceiver(PacketID, (client, handler, byteBuf, responseSender) -> {
+		ClientPlayNetworking.registerGlobalReceiver(RenewAutoInitialize.DISPENSER_BOBBER_SPAWN_PACKET_ID, (client, handler, byteBuf, responseSender) -> {
 			if (client.world != null) {
 				EntitySpawnS2CPacket spawnPacket = new EntitySpawnS2CPacket(byteBuf);
-				Entity e = spawnPacket.getEntityTypeId().create(client.world);
-				if (e == null)
-					throw new IllegalStateException("Failed to create instance of entity \"" + Registry.ENTITY_TYPE.getId(spawnPacket.getEntityTypeId()) + "\"!");
-				e.onSpawnPacket(spawnPacket);
-				DispenserFishingBobberEntity bobber = (DispenserFishingBobberEntity)e;
+				Entity entity = spawnPacket.getEntityType().create(client.world);
+				if (entity == null)
+					throw new IllegalStateException("Failed to create instance of entity");
+				entity.onSpawnPacket(spawnPacket);
+				DispenserFishingBobberEntity bobber = (DispenserFishingBobberEntity)entity;
 				bobber.setOwnerPosition(EntitySpawnPacket.PacketBufUtil.readVec3d(byteBuf));
-				client.world.addEntity(spawnPacket.getId(), e);
+				client.world.addEntity(entity);
 			}
 		});
 	}

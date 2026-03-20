@@ -1,24 +1,29 @@
-package net.fabricmc.renew_auto;
+package net.renew_auto;
 
-import net.minecraft.network.Packet;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-//import net.minecraft.util.registry.Registry;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 public class EntitySpawnPacket {
-    public static Packet<?> create(DispenserFishingBobberEntity e, Identifier packetID) {
-		if (e.world.isClient)
+    public static Packet<ClientPlayPacketListener> create(DispenserFishingBobberEntity entity, Identifier packetID) {
+		if (entity.getWorld().isClient)
 			throw new IllegalStateException("SpawnPacketUtil.create called on the logical client!");
 		PacketByteBuf byteBuf = new PacketByteBuf(Unpooled.buffer());
-		EntitySpawnS2CPacket spawnPacket = new EntitySpawnS2CPacket(e.getId(), e.getUuid(), e.getX(), e.getY(), e.getZ(), e.getPitch(), e.getYaw(), e.getType(), e.getId(), e.getVelocity());
+		EntitySpawnS2CPacket spawnPacket = new EntitySpawnS2CPacket(entity.getId(), entity.getUuid(), entity.getX(), entity.getY(), entity.getZ(), entity.getPitch(), entity.getYaw(), entity.getType(), entity.getId(), entity.getVelocity(), entity.getHeadYaw());
 		spawnPacket.write(byteBuf);
-		PacketBufUtil.writeVec3d(byteBuf, new Vec3d(e.getOwnerPosition().getX(), e.getOwnerPosition().getY(), e.getOwnerPosition().getZ()));
-		return ServerPlayNetworking.createS2CPacket(packetID, byteBuf);
+		PacketBufUtil.writeVec3d(byteBuf, new Vec3d(entity.getOwnerPosition().getX(), entity.getOwnerPosition().getY(), entity.getOwnerPosition().getZ()));
+		for (ServerPlayerEntity player : PlayerLookup.tracking(entity)) {
+            ServerPlayNetworking.send(player, RenewAutoInitialize.DISPENSER_BOBBER_SPAWN_PACKET_ID, byteBuf);
+        }
+		return spawnPacket;
 	}
 	public static final class PacketBufUtil {
  

@@ -1,4 +1,4 @@
-package net.fabricmc.renew_auto;
+package net.renew_auto;
 
 import java.util.Iterator;
 import java.util.List;
@@ -17,7 +17,6 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.MutableText;
 import net.minecraft.nbt.NbtCompound;
@@ -26,7 +25,7 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandlerContext;
 
 public class CraftingFilterItem extends Item implements Inventory {
-    private static final Text TITLE = new TranslatableText("container.crafting");
+    private static final Text TITLE = Text.translatable("container.crafting");
     private DefaultedList<ItemStack> temporaryItemStacks;
     private boolean hasBeenUsedOnBlock = false;
 
@@ -172,7 +171,7 @@ public class CraftingFilterItem extends Item implements Inventory {
                     itemStack = ItemStack.fromNbt(subNbt);
                     
                     if (!itemStack.isEmpty()) {
-                        MutableText mutableText = itemStack.getName().shallowCopy();
+                        MutableText mutableText = itemStack.getName().copy();
                         tooltip.add(mutableText);
                     }
                 }

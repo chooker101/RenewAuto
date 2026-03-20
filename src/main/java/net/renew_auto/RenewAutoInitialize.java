@@ -1,7 +1,7 @@
-package net.fabricmc.renew_auto;
+package net.renew_auto;
 
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemGroups;
 import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.block.Blocks;
@@ -9,43 +9,41 @@ import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.BlockPlacementDispenserBehavior;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.entity.EntityDimensions;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.resource.featuretoggle.FeatureFlags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
 import net.minecraft.block.entity.BlockEntityType;
-import net.fabricmc.renew_auto.dispenser.FishingRodDispenserBehavior;
-import net.fabricmc.renew_auto.dispenser.ToolDispenserBehavior;
-import net.fabricmc.renew_auto.dispenser.PlantDispenserBehavior;
+import net.renew_auto.dispenser.FishingRodDispenserBehavior;
+import net.renew_auto.dispenser.ToolDispenserBehavior;
+import net.renew_auto.dispenser.PlantDispenserBehavior;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
-import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
-
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 public class RenewAutoInitialize implements ModInitializer {
 	public static final Identifier CRAFTING_EXT = new Identifier("renew_auto", "crafting_ext");
 	public static final Identifier CRAFTING_ENTITY = new Identifier("renew_auto", "crafting_entity");
-	public static final ScreenHandlerType<CraftingScreenHandlerExtension> CRAFTING_SCREEN_EXTENSION = ScreenHandlerRegistry.registerSimple(CRAFTING_EXT, CraftingScreenHandlerExtension::new);
-	public static final BlockEntityType<CraftingTableBlockEntity> CRAFTING_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, CRAFTING_ENTITY, FabricBlockEntityTypeBuilder.create(CraftingTableBlockEntity::new, Blocks.CRAFTING_TABLE).build());
+	public static final ScreenHandlerType<CraftingScreenHandlerExtension> CRAFTING_SCREEN_EXTENSION = new ScreenHandlerType<>(CraftingScreenHandlerExtension::new, FeatureFlags.VANILLA_FEATURES);;
+	public static final BlockEntityType<CraftingTableBlockEntity> CRAFTING_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, CRAFTING_ENTITY, BlockEntityType.Builder.create(CraftingTableBlockEntity::new, Blocks.CRAFTING_TABLE).build());
  
-	public static final FabricEntityTypeBuilder<DispenserFishingBobberEntity> DISPENSER_FISHING_BOBBER_BUILDER = FabricEntityTypeBuilder.create(SpawnGroup.MISC, DispenserFishingBobberEntity::new);
 	public static final EntityType<DispenserFishingBobberEntity> FISHING_BOBBER_ENTITY = Registry.register(
-		Registry.ENTITY_TYPE, 
+		Registries.ENTITY_TYPE, 
 		new Identifier("renew_auto", "fishing_bobber_entity"),
-        DISPENSER_FISHING_BOBBER_BUILDER.dimensions(EntityDimensions.fixed(0.75f, 0.75f)).build()
+        EntityType.Builder.<DispenserFishingBobberEntity>create(DispenserFishingBobberEntity::new, SpawnGroup.MISC).setDimensions(0.75f, 0.75f).build()
     );
 	
 
 	public static FabricItemSettings FILTER_SETTINGS = new FabricItemSettings();
 	static {
-		FILTER_SETTINGS.group(ItemGroup.MISC);
 		FILTER_SETTINGS.maxCount(1);
 		FILTER_SETTINGS.rarity(Rarity.UNCOMMON);
 	}
 	public static final Item CRAFTING_FILTER = new CraftingFilterItem(FILTER_SETTINGS);
 	public static final Item HOPPER_FILTER = new HopperFilterItem(FILTER_SETTINGS);
+
+	public static final Identifier DISPENSER_BOBBER_SPAWN_PACKET_ID = new Identifier("renew_auto", "dispenser_bobber_spawn_packet");
 
 	@Override
 	public void onInitialize() {
@@ -102,8 +100,10 @@ public class RenewAutoInitialize implements ModInitializer {
 		DispenserBlock.registerBehavior(Items.POTATO, new PlantDispenserBehavior());
 		DispenserBlock.registerBehavior(Items.NETHER_SPROUTS, new BlockPlacementDispenserBehavior());
 
-		Registry.register(Registry.ITEM, new Identifier("renew_auto", "crafting_filter"), CRAFTING_FILTER);
-		Registry.register(Registry.ITEM, new Identifier("renew_auto", "hopper_filter"), HOPPER_FILTER);
+		Registry.register(Registries.ITEM, new Identifier("renew_auto", "crafting_filter"), CRAFTING_FILTER);
+		Registry.register(Registries.ITEM, new Identifier("renew_auto", "hopper_filter"), HOPPER_FILTER);
+		ItemGroupEvents.modifyEntriesEvent(ItemGroups.REDSTONE).register(content -> { content.add(CRAFTING_FILTER); });
+		ItemGroupEvents.modifyEntriesEvent(ItemGroups.REDSTONE).register(content -> { content.add(HOPPER_FILTER); });
 		
 		System.out.println("RenewAuto is loaded.");
 	}

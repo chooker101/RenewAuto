@@ -1,4 +1,4 @@
-package net.fabricmc.renew_auto;
+package net.renew_auto;
 
 import java.util.Iterator;
 import net.minecraft.entity.player.PlayerEntity;

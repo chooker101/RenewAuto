@@ -1,4 +1,4 @@
-package net.fabricmc.renew_auto.extension;
+package net.renew_auto.extension;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;

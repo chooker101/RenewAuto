@@ -1,4 +1,4 @@
-package net.fabricmc.renew_auto;
+package net.renew_auto;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;

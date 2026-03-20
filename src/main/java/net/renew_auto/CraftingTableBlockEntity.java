@@ -1,4 +1,4 @@
-package net.fabricmc.renew_auto;
+package net.renew_auto;
 
 import java.util.Iterator;
 import java.util.Optional;
@@ -8,11 +8,12 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.CraftingRecipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -40,7 +41,7 @@ public class CraftingTableBlockEntity extends LootableContainerBlockEntity imple
    }
 
    protected Text getContainerName() {
-      return new TranslatableText(getCachedState().getBlock().getTranslationKey());
+      return Text.translatable(getCachedState().getBlock().getTranslationKey());
    }
 
    protected boolean isFilterEmpty() {
@@ -60,7 +61,7 @@ public class CraftingTableBlockEntity extends LootableContainerBlockEntity imple
    public void readNbt(NbtCompound nbt) {
       super.readNbt(nbt);
       if(this.craftingInventory.isEmpty()) {
-         if (!this.deserializeLootTable(nbt)) {
+         if (!this.readLootTable(nbt)) {
             DefaultedList<ItemStack> temp = DefaultedList.ofSize(9, ItemStack.EMPTY);
             Inventories.readNbt(nbt, temp);
 
@@ -99,10 +100,10 @@ public class CraftingTableBlockEntity extends LootableContainerBlockEntity imple
 
    protected ItemStack getCraftedOutput() {
       ItemStack itemStack = ItemStack.EMPTY;
-      Optional<CraftingRecipe> optional = world.getServer().getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftingInventory, world);
+      Optional<RecipeEntry<CraftingRecipe>> optional = world.getServer().getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftingInventory, world);
       if (optional.isPresent()) {
-         CraftingRecipe craftingRecipe = (CraftingRecipe)optional.get();
-         itemStack = craftingRecipe.craft(craftingInventory);
+         CraftingRecipe craftingRecipe = (CraftingRecipe)optional.get().value();
+         itemStack = craftingRecipe.craft(craftingInventory, world.getRegistryManager());
 
          for(int i = 0; i < 9; ++i) {
             if(!getStack(i).isEmpty()){
@@ -117,10 +118,10 @@ public class CraftingTableBlockEntity extends LootableContainerBlockEntity imple
 
    protected ItemStack getCraftedStack() {
       ItemStack itemStack = ItemStack.EMPTY;
-      Optional<CraftingRecipe> optional = world.getServer().getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftingInventory, world);
+      Optional<RecipeEntry<CraftingRecipe>> optional = world.getServer().getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftingInventory, world);
       if (optional.isPresent()) {
-         CraftingRecipe craftingRecipe = (CraftingRecipe)optional.get();
-         itemStack = craftingRecipe.getOutput();
+         CraftingRecipe craftingRecipe = (CraftingRecipe)optional.get().value();
+         itemStack = craftingRecipe.getResult(world.getRegistryManager());
       }
       return itemStack;
    }
@@ -240,8 +241,13 @@ public class CraftingTableBlockEntity extends LootableContainerBlockEntity imple
    }
 
    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
-      var sh = new CraftingScreenHandlerExtension(syncId, playerInventory, ScreenHandlerContext.create(world, pos), craftingInventory, false);
-      sh.onContentChanged(craftingInventory);
-      return sh;
+      var handler = new CraftingScreenHandlerExtension(syncId, playerInventory, ScreenHandlerContext.create(world, pos), craftingInventory, false);
+      handler.onContentChanged(craftingInventory);
+      return handler;
+   }
+
+   @Override
+   protected DefaultedList<ItemStack> method_11282() {
+      return craftingInventory.stacks;
    }
 }

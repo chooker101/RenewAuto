@@ -1,10 +1,10 @@
-package net.fabricmc.renew_auto.extension;
+package net.renew_auto.extension;
 
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.SpawnerBlock;
 import net.minecraft.block.BlockState;
-import net.minecraft.world.BlockView;
+import net.minecraft.world.WorldView;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 
@@ -19,7 +19,7 @@ public abstract class SpawnerBlockExtension extends BlockWithEntity {
     }
 
     @Override
-    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
         return new ItemStack(this);
     }
 }

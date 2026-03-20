@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8.2",
+  "package": "net.renew_auto.client.extension",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [],
+  "client": [
+  ],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

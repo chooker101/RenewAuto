@@ -1,4 +1,4 @@
-package net.fabricmc.renew_auto.extension;
+package net.renew_auto.extension;
 
 import net.minecraft.block.CraftingTableBlock;
 import net.minecraft.block.Block;
@@ -10,7 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.ItemScatterer;
-import net.fabricmc.renew_auto.CraftingTableBlockEntity;
+import net.renew_auto.CraftingTableBlockEntity;
 
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;

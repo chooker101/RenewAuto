@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8.2",
-  "package": "net.fabricmc.renew_auto.extension",
+  "package": "net.renew_auto.extension",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "HopperBlockEntityExtension",

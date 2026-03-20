@@ -19,20 +19,24 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.fabricmc.renew_auto.RenewAutoInitialize"
+      "net.renew_auto.RenewAutoInitialize"
     ],
     "client": [
-      "net.fabricmc.renew_auto.RenewAutoClientInitialize"
+      "net.renew_auto.RenewAutoClientInitialize"
     ]
   },
   "mixins": [
-    "renew_auto.mixins.json"
+    "renew_auto.mixins.json",
+    {
+			"config": "renew_auto.client.mixins.json",
+			"environment": "client"
+		}
   ],
 
   "depends": {
-    "fabricloader": ">=0.12.8",
+    "fabricloader": ">=0.15.9",
     "fabric": "*",
-    "minecraft": "1.18.x",
+    "minecraft": "~1.20.4",
     "java": ">=17"
   },
   "suggests": {
